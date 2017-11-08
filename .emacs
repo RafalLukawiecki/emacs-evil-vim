@@ -55,7 +55,7 @@
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
- '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))))
+ '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))) t)
  '(ns-alternate-modifier (quote meta))
  '(ns-command-modifier (quote super))
  '(ns-right-alternate-modifier (quote none))
@@ -64,6 +64,7 @@
    (quote
     (markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
+ '(send-mail-function (quote sendmail-send-it))
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
@@ -164,7 +165,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Save sessions on exit
-;;(desktop-save-mode 1)
+;; (desktop-save-mode 1)
 (savehist-mode 1)
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -189,21 +190,38 @@
 ;;;;;;;; SCROLLING ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'sublimity)
-(require 'sublimity-scroll)
-;;(require 'sublimity-map) ;; experimental
-;;(require 'sublimity-attractive)
-(sublimity-mode 1)
-(setq sublimity-scroll-weight 5
-      sublimity-scroll-drift-length 10)
-;;(sublimity-map-set-delay 0)
+(if window-system
+    (require 'sublimity)
+  (require 'sublimity-scroll)
+  ;;(require 'sublimity-map) ;; experimental
+  ;;(require 'sublimity-attractive)
+  (sublimity-mode 1)
+  (setq sublimity-scroll-weight 5
+	sublimity-scroll-drift-length 10)
+  ;;(sublimity-map-set-delay 0)
 
-;; Mouse smoothish scrolling
-(require 'smooth-scrolling)
-(setq smooth-scroll-margin 2)
-(setq smooth-scrolling-mode 1)
-(setq mouse-wheel-scroll-amount '(1 ((shift) .1) ((control) . nil)))
+  ;; Mouse smoothish scrolling
+  (require 'smooth-scrolling)
+  (setq smooth-scroll-margin 2)
+  (setq smooth-scrolling-mode 1)
+  (setq mouse-wheel-scroll-amount '(1 ((shift) .1) ((control) . nil)))
+  )
+
 (setq mouse-wheel-progressive-speed t)
+
+(unless window-system
+  (require 'mouse)
+  (xterm-mouse-mode t)
+  (global-set-key [mouse-4] (lambda ()
+                              (interactive)
+                              (scroll-down 3)))
+  (global-set-key [mouse-5] (lambda ()
+                              (interactive)
+                              (scroll-up 3)))
+  (defun track-mouse (e))
+  (setq mouse-sel-mode t)
+)
+;; See further below (evil section) workaround for an xterm mouse issue
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -278,6 +296,21 @@
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
 
+;; Workaround for xterm-mouse-mode issue in text terminal with evil-mode
+(unless window-system
+  (with-eval-after-load 'evil-maps
+    (define-key evil-motion-state-map [down-mouse-1] nil))
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; OTHER SHORTCUTS ;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(menu-bar-mode -1)  ;; disable, allow f9 for toggling
+(global-set-key (kbd "<f9>")
+				'toggle-menu-bar-mode-from-frame)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; UNDO TREE ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -344,14 +377,14 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Initialise SLIME
-(add-to-list 'load-path "~/Projects/slime")
-(require 'slime-autoloads)
-(setq inferior-list-program "/opt/local/bin/lisp")
-(add-to-list 'slime-contribs 'slime-fancy)
-(eval-after-load 'slime
-  '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
-
-(mapc 'frame-set-background-mode (frame-list))
+;(add-to-list 'load-path "~/Projects/slime")
+;(require 'slime-autoloads)
+;(setq inferior-list-program "/opt/local/bin/lisp")
+;(add-to-list 'slime-contribs 'slime-fancy)
+;(eval-after-load 'slime
+;  '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
+;
+;(mapc 'frame-set-background-mode (frame-list))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
