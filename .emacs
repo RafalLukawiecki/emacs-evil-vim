@@ -1,21 +1,34 @@
+;;; Init --- Summary
+;;; Commentary:
+
+;;; RLL macOS/FreeBSD/Linux/Windows portable Emacs initialisation file
+;;; This file should work across the OSs, both in text and GUI Emacs.
+;;; There is code that enables Lisp/Slime, which may need to be tidied up
+;;; or commented out.
+
+
+;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; PACKAGES ;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Packages in use RLL
 (setq package-list '(color-theme-solarized smooth-scrolling sublimity evil async helm
-					   evil-surround evil-leader))
-
+                                           evil-surround evil-leader whitespace
+                                           smart-tabs-mode undo-tree evil-quickscope
+                                           evil-easymotion evil-numbers evil-matchit
+                                           markdown-mode flycheck web-mode php-mode
+                                           ))
 ;; Considered but not using: evil-tabs
-      
+
 ;; Package system init
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("marmalade" . "https://marmalade-repo.org/packages/")))
 
 (package-initialize)
 
-;; fetch the list of packages available 
+;; fetch the list of packages available
 (unless package-archive-contents
   (package-refresh-contents))
 
@@ -47,7 +60,9 @@
  '(ns-command-modifier (quote super))
  '(ns-right-alternate-modifier (quote none))
  '(ns-right-command-modifier (quote none))
- '(package-selected-packages (quote (0blayout ## dash solarized-theme)))
+ '(package-selected-packages
+   (quote
+    (markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
  '(size-indication-mode t)
@@ -70,39 +85,89 @@
 
 (if (display-graphic-p) (custom-set-variables '(tool-bar-mode nil)))
 
-(set-face-attribute 'default nil :family "Menlo" :height 130 :weight 'normal)
+(set-face-attribute 'default nil :family "Menlo" :height 120 :weight 'normal)
 
 ;; Auto-size the window when in GUI to top, most of the height (bar 100 px) and
 ;; centred on the current display monitor.
-(defun set-frame-size-according-to-resolution ()
+;;(defun set-frame-size-according-to-resolution ()
+;;  (interactive)
+;;  (if (display-graphic-p)
+;;      (progn
+;;      (add-to-list 'default-frame-alist (cons 'top 0))
+;;      (add-to-list 'default-frame-alist (cons 'width 140))
+;;      (add-to-list 'default-frame-alist
+;;                   (cons 'height (/ (- (display-pixel-height) 100)
+;;                                    (frame-char-height))))
+;;      (add-to-list 'default-frame-alist
+;;                   (cons 'left
+;;                         (/ (-
+;;                             (nth 3 (car (frame-monitor-attributes)))
+;;                             (* 140 (frame-char-width)))
+;;                            2)))
+;;      ))
+;;  )
+
+(defun set-frame-size-according-to-resolution (frame)
+  (select-frame frame)
   (interactive)
   (if (display-graphic-p)
       (progn
-	(add-to-list 'default-frame-alist (cons 'top 0))
-	(add-to-list 'default-frame-alist (cons 'width 140))
-	(add-to-list 'default-frame-alist
-		     (cons 'height (/ (- (display-pixel-height) 100)
-				      (frame-char-height))))
-	(add-to-list 'default-frame-alist
-		     (cons 'left
-			   (/ (-
-			       (nth 3 (car (frame-monitor-attributes)))
-			       (* 140 (frame-char-width)))
-			      2)))
-	))
+        (set-frame-width frame 165)
+        (set-frame-height frame (/ (- (display-pixel-height) 100) (frame-char-height)))
+        (set-frame-position frame
+                            (/ (-
+                                (nth 3 (car (frame-monitor-attributes)))
+                                (* 175 (frame-char-width)))
+                               2)
+                            0)
+        ))
   )
 
-(set-frame-size-according-to-resolution)
+(add-hook 'after-make-frame-functions 'set-frame-size-according-to-resolution)
+;; (set-frame-size-according-to-resolution (selected-frame))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; FULL SCREEN ;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun toggle-fullscreen ()
+  "Toggle full screen"
+  (interactive)
+  (set-frame-parameter
+   nil 'fullscreen
+   (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; TABS & INDENT ;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'whitespace)
+;; (setq-default tab-width 4)
+(setq tab-width 4) ; or any other preferred value
+(defvaralias 'c-basic-offset 'tab-width)
+(defvaralias 'cperl-indent-level 'tab-width)
+
+(require 'smart-tabs-mode)
+(smart-tabs-insinuate 'c 'javascript 'python 'nxml)
+
+(defun iwb ()
+  "Indent whole buffer."
+  (interactive)
+  (delete-trailing-whitespace)
+  (indent-region (point-min) (point-max) nil)
+  (untabify (point-min) (point-max)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; NICETIES ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Save sessions on exit
-(desktop-save-mode 1)
+;;(desktop-save-mode 1)
 (savehist-mode 1)
-
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+(add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; BELL ALERT ;;;;;;;;;;
@@ -112,10 +177,10 @@
   "A friendlier visual bell effect."
   (lambda ()
     (unless (memq this-command
-		  '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
+                  '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
       (invert-face 'mode-line)
       (run-with-timer 0.1 nil 'invert-face 'mode-line))))
- 
+
 (setq visible-bell nil
       ring-bell-function #'subtle-visible-bell)
 
@@ -167,26 +232,9 @@
 ;;;;;;;;;; EVIL ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'evil-leader)
-(global-evil-leader-mode)
-(evil-leader/set-leader ",")
-(evil-leader/set-key
-  "e" 'find-file
-  "b" 'switch-to-buffer
-  "k" 'kill-buffer
-  "1" 'delete-other-windows
-  "m" 'helm-bookmarks)
 
 (setq evil-want-C-u-scroll t)
 (setq evil-want-fine-undo t)
-(require 'evil)
-(evil-mode 1)
-;; (require 'evil-tabs)
-;; (global-evil-tabs-mode t)
-
-(require 'evil-surround)
-(global-evil-surround-mode 1)
-
 
 ;; Based on https://juanjoalvarez.net/es/detail/2014/sep/19/vim-emacsevil-chaotic-migration-guide/
 (setq evil-emacs-state-cursor '("#dc322f" box))        ;; Red solarized
@@ -195,6 +243,56 @@
 (setq evil-insert-state-cursor '("#dc322f" bar))
 (setq evil-replace-state-cursor '("#dc322f" bar))
 (setq evil-operator-state-cursor '("#dc322f" hollow))
+
+(require 'evil)
+(evil-mode 1)
+;; (require 'evil-tabs)
+;; (global-evil-tabs-mode t)
+
+(require 'evil-surround)
+(global-evil-surround-mode 1)
+
+(require 'evil-leader)
+(global-evil-leader-mode)
+(evil-leader/set-leader ",")
+(evil-leader/set-key
+  "e" 'find-file
+  "b" 'switch-to-buffer
+  "k" 'kill-buffer
+  "1" 'delete-other-windows
+  "m" 'helm-bookmarks
+  "0" 'toggle-fullscreen
+  "w" 'whitespace-mode
+  ";" 'comment-line)
+
+(require 'evil-quickscope)
+(global-evil-quickscope-always-mode 1)
+
+(require 'evil-easymotion)
+(evilem-default-keybindings "SPC")
+
+(require 'evil-numbers)
+(global-set-key (kbd "C-c +") 'evil-numbers/inc-at-pt)
+(global-set-key (kbd "C-c -") 'evil-numbers/dec-at-pt)
+
+(require 'evil-matchit)
+(global-evil-matchit-mode 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; UNDO TREE ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'undo-tree)
+(global-undo-tree-mode 1)
+(setq undo-tree-auto-save-history t)
+(setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; BACKUPS ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -254,3 +352,26 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
 
 (mapc 'frame-set-background-mode (frame-list))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; OS X GUI/SERVER  ;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Following https://korewanetadesu.com/emacs-on-os-x.html
+
+(when (featurep 'ns)
+  (defun ns-raise-emacs ()
+    "Raise Emacs."
+    (ns-do-applescript "tell application \"Emacs\" to activate"))
+
+  (defun ns-raise-emacs-with-frame (frame)
+    "Raise Emacs and select the provided frame."
+    (with-selected-frame frame
+      (when (display-graphic-p)
+        (ns-raise-emacs))))
+
+  (add-hook 'after-make-frame-functions 'ns-raise-emacs-with-frame)
+
+  (when (display-graphic-p)
+    (ns-raise-emacs)))
