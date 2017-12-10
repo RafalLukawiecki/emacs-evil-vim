@@ -24,7 +24,8 @@
 
 ;; Package system init
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
+                         ;;("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://melpa.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")))
 
 (package-initialize)
@@ -399,7 +400,21 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;;;;;;;;; CLIPBOARD ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq select-enable-clipboard nil)
+(setq select-enable-clipboard t)
+
+(defun my:copy-to-tmux (text &optional push)
+  "Copy TEXT (vim yank) to tmux clipboard using yank.sh.  PUSH ignored."
+  (if window-system
+      (gui-select-text text)
+    (if (file-exists-p "~/.tmux/yank.sh")
+	(let ((process-connection-type nil))
+	  (let ((proc (start-process "yank.sh" "*Messages*" "~/.tmux/yank.sh")))
+	    (process-send-string proc text)
+	    (process-send-eof proc))))
+    ))
+
+(setq interprogram-cut-function 'my:copy-to-tmux)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; SLIME ;;;;;;;;;;;;;;
