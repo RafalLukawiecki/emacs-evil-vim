@@ -19,6 +19,7 @@
                                            evil-easymotion evil-numbers evil-matchit
                                            markdown-mode flycheck web-mode php-mode
 					   projectile helm-projectile flx-ido
+					   dtrt-indent fill-column-indicator
                                            ))
 ;; Considered but not using: evil-tabs
 
@@ -64,7 +65,7 @@
  '(ns-right-command-modifier (quote none))
  '(package-selected-packages
    (quote
-    (flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
+    (fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
  '(send-mail-function (quote sendmail-send-it))
  '(show-paren-mode t)
@@ -135,7 +136,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun toggle-fullscreen ()
-  "Toggle full screen"
+  "Toggle full screen."
   (interactive)
   (set-frame-parameter
    nil 'fullscreen
@@ -147,7 +148,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'whitespace)
+(setq whitespace-line-column 80)
+(setq whitespace-style '(face tabs spaces trailing
+							  ;; lines-tail
+							  space-before-tab newline
+							  indentation empty space-after-tab
+							  space-mark tab-mark newline-mark))
+
 ;; (setq-default tab-width 4)
+;; To disable tabs, or enable BSD, try https://juanjoalvarez.net/es/detail/2014/sep/19/vim-emacsevil-chaotic-migration-guide/
 (setq tab-width 4) ; or any other preferred value
 (defvaralias 'c-basic-offset 'tab-width)
 (defvaralias 'cperl-indent-level 'tab-width)
@@ -155,12 +164,42 @@
 (require 'smart-tabs-mode)
 (smart-tabs-insinuate 'c 'javascript 'python 'nxml)
 
+(smart-tabs-add-language-support php php-mode-hook
+      ((php-indent-line . 2)
+       (php-indent-region . 2)))
+
 (defun iwb ()
   "Indent whole buffer."
   (interactive)
   (delete-trailing-whitespace)
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
+
+(require 'dtrt-indent)
+(dtrt-indent-mode 1)
+
+;; Auto fill column modes, use fci-mode
+(require 'fill-column-indicator)
+(add-hook 'text-mode-hook (lambda ()
+                            (turn-on-auto-fill)
+                            (fci-mode)
+                            (set-fill-column 82)))
+(add-hook 'markdown-mode-hook (lambda ()
+                            (turn-on-auto-fill)
+                            (fci-mode)
+                            (set-fill-column 82)))
+
+(add-hook 'python-mode-hook (lambda ()
+                              (fci-mode)
+                              (set-fill-column 94)))
+
+(add-hook 'c-mode-hook (lambda ()
+                         (fci-mode)
+                         (set-fill-column 94)))
+
+(add-hook 'sh-mode-hook (lambda ()
+                         (fci-mode)
+                         (set-fill-column 94)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; NICETIES ;;;;;;;;;;;
@@ -171,6 +210,7 @@
 (savehist-mode 1)
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 (add-hook 'after-init-hook #'global-flycheck-mode)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; BELL ALERT ;;;;;;;;;;
