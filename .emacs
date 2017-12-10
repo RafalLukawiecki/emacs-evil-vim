@@ -18,6 +18,7 @@
                                            smart-tabs-mode undo-tree evil-quickscope
                                            evil-easymotion evil-numbers evil-matchit
                                            markdown-mode flycheck web-mode php-mode
+					   projectile helm-projectile flx-ido
                                            ))
 ;; Considered but not using: evil-tabs
 
@@ -55,14 +56,14 @@
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
- '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))) t)
+ '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))))
  '(ns-alternate-modifier (quote meta))
  '(ns-command-modifier (quote super))
  '(ns-right-alternate-modifier (quote none))
  '(ns-right-command-modifier (quote none))
  '(package-selected-packages
    (quote
-    (markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
+    (flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
  '(send-mail-function (quote sendmail-send-it))
  '(show-paren-mode t)
@@ -360,6 +361,28 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (dired-async-mode 1)
 (async-bytecomp-package-mode 1)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; PROJECTILE and FLX-IDO ;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(projectile-global-mode)
+(setq projectile-enable-caching t)
+
+
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+
+;; Recent files
+(recentf-mode 1)
+(setq recentf-max-menu-items 80)
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+(run-at-time nil (* 5 60) 'recentf-save-list)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; HELM ;;;;;;;;;;;;;;
@@ -371,6 +394,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (setq bookmark-default-file "~/.emacs.d/bookmarks"
       bookmark-save-flag 1) ;; save after every change
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;; CLIPBOARD ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq select-enable-clipboard nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; SLIME ;;;;;;;;;;;;;;
