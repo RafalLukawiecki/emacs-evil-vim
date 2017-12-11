@@ -18,8 +18,9 @@
                                            smart-tabs-mode undo-tree evil-quickscope
                                            evil-easymotion evil-numbers evil-matchit
                                            markdown-mode flycheck web-mode php-mode
-					   projectile helm-projectile flx-ido
-					   dtrt-indent fill-column-indicator
+                                           projectile helm-projectile flx-ido
+                                           dtrt-indent fill-column-indicator
+                                           org evil-org
                                            ))
 ;; Considered but not using: evil-tabs
 
@@ -27,7 +28,8 @@
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ;;("melpa" . "https://melpa.org/packages/")
                          ("melpa-stable" . "https://melpa.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")))
+                         ;; ("marmalade" . "https://marmalade-repo.org/packages/"))
+                         ))
 
 (package-initialize)
 
@@ -65,7 +67,7 @@
  '(ns-right-command-modifier (quote none))
  '(package-selected-packages
    (quote
-    (fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
+    (evil-org fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
  '(send-mail-function (quote sendmail-send-it))
  '(show-paren-mode t)
@@ -150,10 +152,10 @@
 (require 'whitespace)
 (setq whitespace-line-column 80)
 (setq whitespace-style '(face tabs spaces trailing
-							  ;; lines-tail
-							  space-before-tab newline
-							  indentation empty space-after-tab
-							  space-mark tab-mark newline-mark))
+                              ;; lines-tail
+                              space-before-tab newline
+                              indentation empty space-after-tab
+                              space-mark tab-mark newline-mark))
 
 ;; (setq-default tab-width 4)
 ;; To disable tabs, or enable BSD, try https://juanjoalvarez.net/es/detail/2014/sep/19/vim-emacsevil-chaotic-migration-guide/
@@ -165,8 +167,8 @@
 (smart-tabs-insinuate 'c 'javascript 'python 'nxml)
 
 (smart-tabs-add-language-support php php-mode-hook
-      ((php-indent-line . 2)
-       (php-indent-region . 2)))
+  ((php-indent-line . 2)
+   (php-indent-region . 2)))
 
 (defun iwb ()
   "Indent whole buffer."
@@ -185,9 +187,9 @@
                             (fci-mode)
                             (set-fill-column 82)))
 (add-hook 'markdown-mode-hook (lambda ()
-                            (turn-on-auto-fill)
-                            (fci-mode)
-                            (set-fill-column 82)))
+                                (turn-on-auto-fill)
+                                (fci-mode)
+                                (set-fill-column 82)))
 
 (add-hook 'python-mode-hook (lambda ()
                               (fci-mode)
@@ -198,8 +200,8 @@
                          (set-fill-column 94)))
 
 (add-hook 'sh-mode-hook (lambda ()
-                         (fci-mode)
-                         (set-fill-column 94)))
+                          (fci-mode)
+                          (set-fill-column 94)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; NICETIES ;;;;;;;;;;;
@@ -239,7 +241,7 @@
   ;;(require 'sublimity-attractive)
   (sublimity-mode 1)
   (setq sublimity-scroll-weight 5
-	sublimity-scroll-drift-length 10)
+        sublimity-scroll-drift-length 10)
   ;;(sublimity-map-set-delay 0)
 
   ;; Mouse smoothish scrolling
@@ -262,7 +264,7 @@
                               (scroll-up 3)))
   (defun track-mouse (e))
   (setq mouse-sel-mode t)
-)
+  )
 ;; See further below (evil section) workaround for an xterm mouse issue
 
 
@@ -342,7 +344,7 @@
 (unless window-system
   (with-eval-after-load 'evil-maps
     (define-key evil-motion-state-map [down-mouse-1] nil))
-)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; OTHER SHORTCUTS ;;;;;;;
@@ -350,7 +352,7 @@
 
 (menu-bar-mode -1)  ;; disable, allow f9 for toggling
 (global-set-key (kbd "<f9>")
-				'toggle-menu-bar-mode-from-frame)
+                'toggle-menu-bar-mode-from-frame)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -403,7 +405,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (async-bytecomp-package-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; PROJECTILE and FLX-IDO ;;;;;
+                                        ; PROJECTILE and FLX-IDO ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (projectile-global-mode)
@@ -447,13 +449,25 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   (if window-system
       (gui-select-text text)
     (if (file-exists-p "~/.tmux/yank.sh")
-	(let ((process-connection-type nil))
-	  (let ((proc (start-process "yank.sh" "*Messages*" "~/.tmux/yank.sh")))
-	    (process-send-string proc text)
-	    (process-send-eof proc))))
+        (let ((process-connection-type nil))
+          (let ((proc (start-process "yank.sh" "*Messages*" "~/.tmux/yank.sh")))
+            (process-send-string proc text)
+            (process-send-eof proc))))
     ))
 
 (setq interprogram-cut-function 'my:copy-to-tmux)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;; ORG ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'org)
+(require 'evil-org)
+(add-hook 'org-mode-hook 'evil-org-mode)
+(evil-org-set-key-theme '(navigation insert textobjects additional calendar))
+(require 'evil-org-agenda)
+(evil-org-agenda-set-keys)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -461,14 +475,14 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Initialise SLIME
-;(add-to-list 'load-path "~/Projects/slime")
-;(require 'slime-autoloads)
-;(setq inferior-list-program "/opt/local/bin/lisp")
-;(add-to-list 'slime-contribs 'slime-fancy)
-;(eval-after-load 'slime
-;  '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
-;
-;(mapc 'frame-set-background-mode (frame-list))
+                                        ;(add-to-list 'load-path "~/Projects/slime")
+                                        ;(require 'slime-autoloads)
+                                        ;(setq inferior-list-program "/opt/local/bin/lisp")
+                                        ;(add-to-list 'slime-contribs 'slime-fancy)
+                                        ;(eval-after-load 'slime
+                                        ;  '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
+                                        ;
+                                        ;(mapc 'frame-set-background-mode (frame-list))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -492,3 +506,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
   (when (display-graphic-p)
     (ns-raise-emacs)))
+
+
+(provide '.emacs)
+;;; .emacs ends here
