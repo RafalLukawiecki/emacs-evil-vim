@@ -20,7 +20,7 @@
                                            markdown-mode flycheck web-mode php-mode
                                            projectile helm-projectile flx-ido
                                            dtrt-indent fill-column-indicator
-                                           org evil-org
+                                           org evil-org apache-mode
                                            ))
 ;; Considered but not using: evil-tabs
 
@@ -67,7 +67,7 @@
  '(ns-right-command-modifier (quote none))
  '(package-selected-packages
    (quote
-    (org evil-org fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
+    (org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
  '(send-mail-function (quote sendmail-send-it))
  '(show-paren-mode t)
@@ -184,7 +184,6 @@
 (require 'fill-column-indicator)
 (add-hook 'text-mode-hook (lambda ()
                             (turn-on-auto-fill)
-                            (fci-mode)
                             (set-fill-column 82)))
 (add-hook 'markdown-mode-hook (lambda ()
                                 (turn-on-auto-fill)
@@ -200,8 +199,20 @@
                          (set-fill-column 94)))
 
 (add-hook 'sh-mode-hook (lambda ()
-                          (fci-mode)
                           (set-fill-column 94)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;; MODES ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(autoload 'apache-mode "apache-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.htaccess\\'"   . apache-mode))
+(add-to-list 'auto-mode-alist '("httpd\\.conf\\'"  . apache-mode))
+(add-to-list 'auto-mode-alist '("vhost\\.conf\\'"  . apache-mode))
+(add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
+(add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
+(add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; NICETIES ;;;;;;;;;;;
@@ -405,7 +416,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (async-bytecomp-package-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        ; PROJECTILE and FLX-IDO ;;;;;
+; PROJECTILE and FLX-IDO ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (projectile-global-mode)
@@ -475,14 +486,14 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Initialise SLIME
-                                        ;(add-to-list 'load-path "~/Projects/slime")
-                                        ;(require 'slime-autoloads)
-                                        ;(setq inferior-list-program "/opt/local/bin/lisp")
-                                        ;(add-to-list 'slime-contribs 'slime-fancy)
-                                        ;(eval-after-load 'slime
-                                        ;  '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
-                                        ;
-                                        ;(mapc 'frame-set-background-mode (frame-list))
+;(add-to-list 'load-path "~/Projects/slime")
+;(require 'slime-autoloads)
+;(setq inferior-list-program "/opt/local/bin/lisp")
+;(add-to-list 'slime-contribs 'slime-fancy)
+;(eval-after-load 'slime
+;  '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
+;
+;(mapc 'frame-set-background-mode (frame-list))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
