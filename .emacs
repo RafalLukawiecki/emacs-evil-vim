@@ -351,6 +351,11 @@
 (require 'evil-matchit)
 (global-evil-matchit-mode 1)
 
+;; Enable M-. to work in lisp modes to show definition at point
+(define-key evil-normal-state-map (kbd "M-.")
+  `(menu-item "" evil-repeat-pop :filter
+              ,(lambda (cmd) (if (eq last-command 'evil-repeat-pop) cmd))))
+
 ;; Workaround for xterm-mouse-mode issue in text terminal with evil-mode
 (unless window-system
   (with-eval-after-load 'evil-maps
@@ -486,14 +491,20 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Initialise SLIME
-;(add-to-list 'load-path "~/Projects/slime")
-;(require 'slime-autoloads)
-;(setq inferior-list-program "/opt/local/bin/lisp")
-;(add-to-list 'slime-contribs 'slime-fancy)
-;(eval-after-load 'slime
-;  '(define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup))
-;
-;(mapc 'frame-set-background-mode (frame-list))
+(add-to-list 'load-path "/Users/rafal/Projects/slime")
+(require 'slime-autoloads)
+(setq inferior-lisp-program "/opt/local/bin/sbcl")
+(add-to-list 'slime-contribs 'slime-fancy 'inferior-slime)
+(setq slime-lisp-implementations
+           '((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
+(eval-after-load 'slime
+  '(progn
+     (define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup)
+     (define-key slime-repl-mode-map (kbd "M-<up>") 'slime-repl-backward-input)
+     (define-key slime-repl-mode-map (kbd "M-<down>") 'slime-repl-forward-input)
+     (sublimity-mode 0)))
+(setq common-lisp-hyperspec-root "file://Users/rafal/Documents/Knowledge/Lisp/clspec30/HyperSpec/")
+(mapc 'frame-set-background-mode (frame-list))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -521,3 +532,4 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 (provide '.emacs)
 ;;; .emacs ends here
+
