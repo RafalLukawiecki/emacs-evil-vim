@@ -20,7 +20,7 @@
                                            markdown-mode flycheck web-mode php-mode
                                            projectile helm-projectile flx-ido
                                            dtrt-indent fill-column-indicator
-                                           org evil-org apache-mode
+                                           org evil-org apache-mode logview
                                            ))
 ;; Considered but not using: evil-tabs
 
@@ -60,14 +60,14 @@
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
- '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))))
+ '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))) t)
  '(ns-alternate-modifier (quote meta))
  '(ns-command-modifier (quote super))
  '(ns-right-alternate-modifier (quote none))
  '(ns-right-command-modifier (quote none))
  '(package-selected-packages
    (quote
-    (org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
+    (logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
  '(send-mail-function (quote sendmail-send-it))
  '(show-paren-mode t)
