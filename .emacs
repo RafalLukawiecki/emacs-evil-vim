@@ -60,7 +60,7 @@
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
- '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))) t)
+ '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))))
  '(ns-alternate-modifier (quote meta))
  '(ns-command-modifier (quote super))
  '(ns-right-alternate-modifier (quote none))
@@ -369,6 +369,18 @@
 (menu-bar-mode -1)  ;; disable, allow f9 for toggling
 (global-set-key (kbd "<f9>")
                 'toggle-menu-bar-mode-from-frame)
+
+
+(defun sort-words (reverse beg end)
+  "Sort words in region alphabetically, in REVERSE if negative.
+    Prefixed with negative \\[universal-argument], sorts in reverse.
+  
+    The variable `sort-fold-case' determines whether alphabetic case
+    affects the sort order.
+  
+    See `sort-regexp-fields'."
+  (interactive "*P\nr")
+  (sort-regexp-fields reverse "\\S-+" "\\&" beg end))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
