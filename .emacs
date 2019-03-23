@@ -57,7 +57,6 @@
  '(custom-enabled-themes nil)
  '(custom-safe-themes
    '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default))
- '(global-linum-mode t)
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
@@ -223,6 +222,7 @@
 (savehist-mode 1)
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 (add-hook 'after-init-hook #'global-flycheck-mode)
+(global-display-line-numbers-mode)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
