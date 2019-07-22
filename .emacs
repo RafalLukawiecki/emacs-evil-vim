@@ -21,8 +21,9 @@
                                            projectile helm-projectile flx-ido
                                            dtrt-indent fill-column-indicator
                                            org evil-org apache-mode logview
-										   robots-txt-mode auto-complete ggtags
-										   js2-mode ac-php ac-js2 drupal-mode
+					   robots-txt-mode auto-complete ggtags
+					   js2-mode ac-php ac-js2 drupal-mode
+					   cider
                                            ))
 ;; Considered but not using: evil-tabs
 
@@ -66,7 +67,7 @@
  '(ns-right-alternate-modifier 'none)
  '(ns-right-command-modifier 'none)
  '(package-selected-packages
-   '(js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme))
+   '(cider js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme))
  '(scroll-bar-mode nil)
  '(send-mail-function 'sendmail-send-it)
  '(show-paren-mode t)
@@ -79,6 +80,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;; PATH ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'exec-path "/opt/local/bin")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; VISUALS ;;;;;;;;;;;;
