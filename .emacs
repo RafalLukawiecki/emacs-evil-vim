@@ -13,18 +13,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Packages in use RLL
-(setq package-list '(color-theme-solarized smooth-scrolling sublimity evil async helm
-                                           evil-surround evil-leader whitespace
-                                           smart-tabs-mode undo-tree evil-quickscope
-                                           evil-easymotion evil-numbers evil-matchit
-                                           markdown-mode flycheck web-mode php-mode
-                                           projectile helm-projectile flx-ido
-                                           dtrt-indent fill-column-indicator
-                                           org evil-org apache-mode logview
-					   robots-txt-mode auto-complete ggtags
-					   js2-mode ac-php ac-js2 drupal-mode
-					   cider
-                                           ))
+(defvar package-list '(solarized-theme smooth-scrolling sublimity evil async helm
+                                       evil-surround evil-leader whitespace
+                                       smart-tabs-mode undo-tree evil-quickscope
+                                       evil-easymotion evil-numbers evil-matchit
+                                       markdown-mode flycheck web-mode php-mode
+                                       projectile helm-gtags helm-projectile flx-ido
+                                       dtrt-indent fill-column-indicator
+                                       org evil-org apache-mode logview
+                                       robots-txt-mode auto-complete ggtags
+                                       js2-mode ac-php ac-js2 drupal-mode
+                                       cider
+                                       ))
 ;; Considered but not using: evil-tabs
 
 ;; Package system init
@@ -57,19 +57,21 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes nil)
  '(custom-safe-themes
-   '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default))
+   (quote
+    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default)))
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
- '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
- '(ns-alternate-modifier 'meta)
- '(ns-command-modifier 'super)
- '(ns-right-alternate-modifier 'none)
- '(ns-right-command-modifier 'none)
+ '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))))
+ '(ns-alternate-modifier (quote meta))
+ '(ns-command-modifier (quote super))
+ '(ns-right-alternate-modifier (quote none))
+ '(ns-right-command-modifier (quote none))
  '(package-selected-packages
-   '(cider js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling color-theme-solarized evil-numbers transpose-frame 0blayout ## dash solarized-theme))
+   (quote
+    (cider js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
  '(scroll-bar-mode nil)
- '(send-mail-function 'sendmail-send-it)
+ '(send-mail-function (quote sendmail-send-it))
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
@@ -93,7 +95,8 @@
 
 ;; Other visual customisations RLL
 ;;(require 'solarized)
-(load-theme 'solarized t)
+;;(load-theme 'solarized t)
+
 
 (if (display-graphic-p) (custom-set-variables '(tool-bar-mode nil)))
 
@@ -120,8 +123,9 @@
 ;;  )
 
 (defun set-frame-size-according-to-resolution (frame)
-  (select-frame frame)
+  "Resizes the FRAME according to the size of the monitor."
   (interactive)
+  (select-frame frame)
   (if (display-graphic-p)
       (progn
         (set-frame-width frame 165)
@@ -289,24 +293,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; THEME ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; Initialize colour theme depending on the colour of the terminal, defaulting to light
-(setq frame-background-mode (if (equal "11;15" (getenv "COLORFGBG")) 'light 'dark))
-(load-theme 'solarized)
+(if (equal "11;15" (getenv "COLORFGBG"))
+    (load-theme 'solarized-light t)
+  (load-theme 'solarized-dark t))
 
 (defun toggle-theme-background ()
   "Toggle light/dark background color scheme."
   (interactive)
-  (if (eq frame-background-mode 'dark)
-      (setq frame-background-mode 'light)
-    (setq frame-background-mode 'dark))
-  (load-theme 'solarized)
-  (mapc 'frame-set-background-mode (frame-list)))
+  (if (eq (car custom-enabled-themes) 'solarized-dark)
+      (load-theme 'solarized-light t)
+    (load-theme 'solarized-dark t)))
 
 (global-set-key (kbd "<f5>") 'toggle-theme-background)
 
-;; Needs reloading
-(load-theme 'solarized t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; EVIL ;;;;;;;;;;;;;;
@@ -380,12 +380,13 @@
 
 (defun sort-words (reverse beg end)
   "Sort words in region alphabetically, in REVERSE if negative.
-    Prefixed with negative \\[universal-argument], sorts in reverse.
-  
-    The variable `sort-fold-case' determines whether alphabetic case
-    affects the sort order.
-  
-    See `sort-regexp-fields'."
+From BEG to END.
+Prefixed with negative \\[universal-argument], sorts in reverse.
+
+The variable `sort-fold-case' determines whether alphabetic case
+affects the sort order.
+
+See `sort-regexp-fields'."
   (interactive "*P\nr")
   (sort-regexp-fields reverse "\\S-+" "\\&" beg end))
 
@@ -440,10 +441,10 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (async-bytecomp-package-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; PROJECTILE and FLX-IDO ;;;;;
+                                        ; PROJECTILE and FLX-IDO ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(projectile-global-mode)
+(projectile-mode)
 (setq projectile-enable-caching t)
 
 
@@ -515,7 +516,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (setq inferior-lisp-program "/opt/local/bin/sbcl")
 (add-to-list 'slime-contribs 'slime-fancy 'inferior-slime)
 (setq slime-lisp-implementations
-           '((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
+      '((sbcl ("sbcl" "--core" "sbcl.core-for-slime"))))
 (eval-after-load 'slime
   '(progn
      (define-key slime-prefix-map (kbd ",h") 'slime-documentation-lookup)
@@ -551,4 +552,3 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 (provide '.emacs)
 ;;; .emacs ends here
-
