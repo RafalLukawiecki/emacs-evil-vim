@@ -337,6 +337,7 @@
 (evil-leader/set-leader ",")
 (evil-leader/set-key
   "e" 'find-file
+  "f" 'projectile-find-file
   "b" 'switch-to-buffer
   "k" 'kill-buffer
   "1" 'delete-other-windows
@@ -441,11 +442,13 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (async-bytecomp-package-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        ; PROJECTILE and FLX-IDO ;;;;;
+; PROJECTILE and FLX-IDO ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (projectile-mode)
 (setq projectile-enable-caching t)
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 
 (require 'flx-ido)
