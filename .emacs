@@ -23,7 +23,8 @@
                                        org evil-org apache-mode logview
                                        robots-txt-mode auto-complete ggtags
                                        js2-mode ac-php ac-js2 drupal-mode
-                                       cider
+                                       cider company-anaconda jedi yasnippet elpy
+				       exec-path-from-shell yaml-mode
                                        ))
 ;; Considered but not using: evil-tabs
 
@@ -59,6 +60,7 @@
  '(custom-safe-themes
    (quote
     ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default)))
+ '(datetime-timezone "Europe/Dublin")
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
@@ -82,6 +84,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; TZ ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(let ((tz (shell-command-to-string ". ~/.timezone; echo -n $TZ")))
+  (setenv "TZ" tz)
+  (customize-set-variable 'datetime-timezone tz))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; PATH ;;;;;;;;;;;;;;;
@@ -174,7 +184,7 @@
 (defvaralias 'cperl-indent-level 'tab-width)
 
 (require 'smart-tabs-mode)
-(smart-tabs-insinuate 'c 'javascript 'python 'nxml)
+(smart-tabs-insinuate 'c 'javascript 'nxml)
 
 (smart-tabs-add-language-support php php-mode-hook
   ((php-indent-line . 2)
@@ -202,10 +212,22 @@
 
 (add-hook 'python-mode-hook (lambda ()
                               (fci-mode)
-                              (set-fill-column 94)))
+			      (setq column-number-mode t)
+			      (elpy-enable)
+			      (setq python-shell-interpreter "jupyter-console"
+				    python-shell-interpreter-args "--simple-prompt"
+				    python-shell-prompt-detect-failure-warning nil
+                    elpy-shell-echo-output nil)
+			      (add-to-list 'python-shell-completion-native-disabled-interpreters
+					   "jupyter")
+			      (setq-default indent-tabs-mode nil)
+			      (setq-default tab-width 4)
+			      (setq-default python-indent 4)
+			      (set-fill-column 79)))
 
 (add-hook 'c-mode-hook (lambda ()
                          (fci-mode)
+			 (setq column-number-mode t)
                          (set-fill-column 94)))
 
 (add-hook 'sh-mode-hook (lambda ()
@@ -222,6 +244,7 @@
 (add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
 (add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
 (add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -257,14 +280,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (if window-system
-    (require 'sublimity)
-  (require 'sublimity-scroll)
-  ;;(require 'sublimity-map) ;; experimental
-  ;;(require 'sublimity-attractive)
-  (sublimity-mode 1)
-  (setq sublimity-scroll-weight 5
-        sublimity-scroll-drift-length 10)
-  ;;(sublimity-map-set-delay 0)
+  ;;   (require 'sublimity)
+  ;; (require 'sublimity-scroll)
+  ;; ;;(require 'sublimity-map) ;; experimental
+  ;; ;;(require 'sublimity-attractive)
+  ;; (sublimity-mode 1)
+  ;; (setq sublimity-scroll-weight 5
+  ;;       sublimity-scroll-drift-length 10)
+  ;; ;;(sublimity-map-set-delay 0)
 
   ;; Mouse smoothish scrolling
   (require 'smooth-scrolling)
@@ -442,7 +465,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (async-bytecomp-package-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; PROJECTILE and FLX-IDO ;;;;;
+										; PROJECTILE and FLX-IDO ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (projectile-mode)
@@ -510,6 +533,11 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;; PYTHON ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; SLIME ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -545,6 +573,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
     "Raise Emacs and select the provided frame."
     (with-selected-frame frame
       (when (display-graphic-p)
+	(exec-path-from-shell-initialize)
         (ns-raise-emacs))))
 
   (add-hook 'after-make-frame-functions 'ns-raise-emacs-with-frame)
@@ -552,6 +581,9 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   (when (display-graphic-p)
     (ns-raise-emacs)))
 
+;; Initialise shell PATH when run in a GUI on a Mac
+;; (when (memq window-system '(mac ns x))
+;;   (exec-path-from-shell-initialize))
 
 (provide '.emacs)
 ;;; .emacs ends here
