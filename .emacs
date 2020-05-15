@@ -1,4 +1,4 @@
-;;; Init --- Summary
+;; Init --- Summary
 ;;; Commentary:
 
 ;;; RLL macOS/FreeBSD/Linux/Windows portable Emacs initialisation file
@@ -13,19 +13,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Packages in use RLL
-(defvar package-list '(solarized-theme smooth-scrolling sublimity evil async helm
-                                       evil-surround evil-leader whitespace
-                                       smart-tabs-mode undo-tree evil-quickscope
-                                       evil-easymotion evil-numbers evil-matchit
-                                       markdown-mode flycheck web-mode php-mode
-                                       projectile helm-gtags helm-projectile flx-ido
-                                       dtrt-indent fill-column-indicator
-                                       org evil-org apache-mode logview
-                                       robots-txt-mode auto-complete ggtags
-                                       js2-mode ac-php ac-js2 drupal-mode
-                                       cider company-anaconda jedi yasnippet elpy
-				       exec-path-from-shell yaml-mode
-                                       ))
+(defvar package-list '(solarized-theme smooth-scrolling sublimity
+                                       evil async helm
+                                       evil-surround evil-leader
+                                       whitespace smart-tabs-mode
+                                       undo-tree evil-quickscope
+                                       evil-easymotion
+                                       evil-numbers evil-matchit
+                                       markdown-mode flycheck
+                                       web-mode php-mode
+                                       projectile helm-gtags
+                                       helm-projectile flx-ido
+                                       dtrt-indent
+                                       fill-column-indicator org
+                                       evil-org apache-mode
+                                       logview robots-txt-mode
+                                       auto-complete ggtags
+                                       js2-mode s f dash xcscope
+                                       popup ac-php-core
+                                       company-php ac-php
+                                       web-mode ac-js2
+                                       drupal-mode cider
+                                       company-anaconda jedi
+                                       yasnippet elpy
+                                       exec-path-from-shell
+                                       yaml-mode ))
 ;; Considered but not using: evil-tabs
 
 ;; Package system init
@@ -212,22 +224,22 @@
 
 (add-hook 'python-mode-hook (lambda ()
                               (fci-mode)
-			      (setq column-number-mode t)
-			      (elpy-enable)
-			      (setq python-shell-interpreter "jupyter-console"
-				    python-shell-interpreter-args "--simple-prompt"
-				    python-shell-prompt-detect-failure-warning nil
-                    elpy-shell-echo-output nil)
-			      (add-to-list 'python-shell-completion-native-disabled-interpreters
-					   "jupyter")
-			      (setq-default indent-tabs-mode nil)
-			      (setq-default tab-width 4)
-			      (setq-default python-indent 4)
-			      (set-fill-column 79)))
+                              (setq column-number-mode t)
+                              (elpy-enable)
+                              (setq python-shell-interpreter "jupyter-console"
+                                    python-shell-interpreter-args "--simple-prompt"
+                                    python-shell-prompt-detect-failure-warning nil
+                                    elpy-shell-echo-output nil)
+                              (add-to-list 'python-shell-completion-native-disabled-interpreters
+                                           "jupyter")
+                              (setq-default indent-tabs-mode nil)
+                              (setq-default tab-width 4)
+                              (setq-default python-indent 4)
+                              (set-fill-column 79)))
 
 (add-hook 'c-mode-hook (lambda ()
                          (fci-mode)
-			 (setq column-number-mode t)
+                         (setq column-number-mode t)
                          (set-fill-column 94)))
 
 (add-hook 'sh-mode-hook (lambda ()
@@ -245,6 +257,8 @@
 (add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
 (add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.php\\|\\.php\\.dev|\\.php\\.prod'" . php-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -280,17 +294,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (if window-system
-  ;;   (require 'sublimity)
-  ;; (require 'sublimity-scroll)
-  ;; ;;(require 'sublimity-map) ;; experimental
-  ;; ;;(require 'sublimity-attractive)
-  ;; (sublimity-mode 1)
-  ;; (setq sublimity-scroll-weight 5
-  ;;       sublimity-scroll-drift-length 10)
-  ;; ;;(sublimity-map-set-delay 0)
+    ;;   (require 'sublimity)
+    ;; (require 'sublimity-scroll)
+    ;; ;;(require 'sublimity-map) ;; experimental
+    ;; ;;(require 'sublimity-attractive)
+    ;; (sublimity-mode 1)
+    ;; (setq sublimity-scroll-weight 5
+    ;;       sublimity-scroll-drift-length 10)
+    ;; ;;(sublimity-map-set-delay 0)
 
-  ;; Mouse smoothish scrolling
-  (require 'smooth-scrolling)
+    ;; Mouse smoothish scrolling
+    (require 'smooth-scrolling)
   (setq smooth-scroll-margin 2)
   (setq smooth-scrolling-mode 1)
   (setq mouse-wheel-scroll-amount '(1 ((shift) .1) ((control) . nil)))
@@ -465,7 +479,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (async-bytecomp-package-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-										; PROJECTILE and FLX-IDO ;;;;;
+                                        ; PROJECTILE and FLX-IDO ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (projectile-mode)
@@ -533,6 +547,45 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; C/JAVA ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              (ggtags-mode 1))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; PHP ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'php-mode)
+(add-hook 'php-mode-hook
+          '(lambda ()
+             ;; Enable company-mode
+             (company-mode t)
+             (require 'company-php)
+
+             ;; Enable ElDoc support (optional)
+             (ac-php-core-eldoc-setup)
+
+             (set (make-local-variable 'company-backends)
+                  '((company-ac-php-backend company-dabbrev-code)
+                    company-capf company-files))
+
+             ;; Jump to definition (optional)
+             (define-key php-mode-map (kbd "M-]")
+               'ac-php-find-symbol-at-point)
+
+             ;; Return back (optional)
+             (define-key php-mode-map (kbd "M-[")
+               'ac-php-location-stack-back)
+
+	     ;; ggtags
+	     (ggtags-mode 1)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; PYTHON ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -573,7 +626,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
     "Raise Emacs and select the provided frame."
     (with-selected-frame frame
       (when (display-graphic-p)
-	(exec-path-from-shell-initialize)
+        (exec-path-from-shell-initialize)
         (ns-raise-emacs))))
 
   (add-hook 'after-make-frame-functions 'ns-raise-emacs-with-frame)
