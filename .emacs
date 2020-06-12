@@ -70,22 +70,20 @@
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes nil)
  '(custom-safe-themes
-   (quote
-    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default)))
+   '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default))
  '(datetime-timezone "Europe/Dublin")
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
- '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))))
- '(ns-alternate-modifier (quote meta))
- '(ns-command-modifier (quote super))
- '(ns-right-alternate-modifier (quote none))
- '(ns-right-command-modifier (quote none))
+ '(mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control))))
+ '(ns-alternate-modifier 'meta)
+ '(ns-command-modifier 'super)
+ '(ns-right-alternate-modifier 'none)
+ '(ns-right-command-modifier 'none)
  '(package-selected-packages
-   (quote
-    (cider js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling evil-numbers transpose-frame 0blayout ## dash solarized-theme)))
+   '(cider js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling evil-numbers transpose-frame 0blayout ## dash solarized-theme))
  '(scroll-bar-mode nil)
- '(send-mail-function (quote sendmail-send-it))
+ '(send-mail-function 'sendmail-send-it)
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
