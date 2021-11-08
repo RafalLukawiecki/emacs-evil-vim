@@ -36,7 +36,7 @@ plugins=(
     git
     dirhistory
     history
-    osx
+    macos
     colored-man-pages
     z
 )
