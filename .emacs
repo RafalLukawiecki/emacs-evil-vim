@@ -16,6 +16,7 @@
 (defvar package-list '(solarized-theme smooth-scrolling sublimity
                                        evil async helm
                                        evil-surround evil-leader
+                                       evil-collection
                                        whitespace smart-tabs-mode
                                        undo-tree evil-quickscope
                                        evil-easymotion
@@ -37,7 +38,11 @@
                                        company-anaconda jedi
                                        yasnippet elpy
                                        exec-path-from-shell
-                                       yaml-mode ))
+                                       yaml-mode
+				       editorconfig
+				       ediprolog
+				       quelpa quelpa-use-package
+				       ))
 ;; Considered but not using: evil-tabs
 
 ;; Package system init
@@ -72,6 +77,7 @@
  '(custom-safe-themes
    '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default))
  '(datetime-timezone "Europe/Dublin" t)
+ '(ediprolog-system 'swi)
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
@@ -81,13 +87,14 @@
  '(ns-right-alternate-modifier 'none)
  '(ns-right-command-modifier 'none)
  '(package-selected-packages
-   '(cider js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling evil-numbers transpose-frame 0blayout ## dash solarized-theme))
+   '(evil-collection auctex cider js2-mode ggtags auto-complete robots-txt-mode php-extras drupal-mode logview org evil-org apache-mode fill-column-indicator dtrt-indent powerline flx-ido helm-projectile projectile markdown-mode flycheck web-mode php-mode evil-matchit evil-easymotion evil-quickscope smart-tabs-mode evil-leader evil-surround helm async evil sublimity smooth-scrolling evil-numbers transpose-frame 0blayout ## dash solarized-theme))
  '(scroll-bar-mode nil)
  '(send-mail-function 'sendmail-send-it)
  '(show-paren-mode t)
  '(size-indication-mode t)
  '(tool-bar-mode nil)
- '(visible-bell t))
+ '(visible-bell t)
+ '(warning-suppress-types '((comp) (comp) (comp) (comp) (comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -257,6 +264,9 @@
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.php\\|\\.php\\.dev|\\.php\\.prod'" . php-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(setq auto-mode-alist (append '(("\\.pl$" . prolog-mode)
+                                ("\\.m$" . mercury-mode))
+                              auto-mode-alist))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -291,7 +301,7 @@
 ;;;;;;;; SCROLLING ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(if window-system
+;; (if window-system
     ;;   (require 'sublimity)
     ;; (require 'sublimity-scroll)
     ;; ;;(require 'sublimity-map) ;; experimental
@@ -306,10 +316,9 @@
   ;; (setq smooth-scroll-margin 2)
   ;; (setq smooth-scrolling-mode 1)
   ;; (setq mouse-wheel-scroll-amount '(1 ((shift) .1) ((control) . nil)))
-	(pixel-scroll-mode)
-  )
+  ;; )
 
-;;(setq mouse-wheel-progressive-speed nil)
+(setq mouse-wheel-progressive-speed t)
 
 (unless window-system
   (require 'mouse)
@@ -323,7 +332,12 @@
   (defun track-mouse (e))
   (setq mouse-sel-mode t)
   )
+
+;; Can above be eliminated now that pixel-scroll is available?
+(pixel-scroll-precision-mode 1)
+
 ;; See further below (evil section) workaround for an xterm mouse issue
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -380,8 +394,7 @@
   "m" 'helm-bookmarks
   "0" 'toggle-fullscreen
   "w" 'whitespace-mode
-  ";" 'comment-line
-  "," 'evil-repeat-find-char-reverse)
+  ";" 'comment-line)
 
 (require 'evil-quickscope)
 (global-evil-quickscope-always-mode 1)
@@ -406,6 +419,9 @@
   (with-eval-after-load 'evil-maps
     (define-key evil-motion-state-map [down-mouse-1] nil))
   )
+
+;; (evil-collection-init 'reftex)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; OTHER SHORTCUTS ;;;;;;;
@@ -479,7 +495,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (async-bytecomp-package-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        ; PROJECTILE and FLX-IDO ;;;;;
+; PROJECTILE and FLX-IDO ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (projectile-mode)
@@ -530,6 +546,22 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
     ))
 
 (setq interprogram-cut-function 'my:copy-to-tmux)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;  COPILOT  ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'quelpa)
+(require 'quelpa-use-package)
+(use-package copilot
+  :quelpa (copilot :fetcher github
+                   :repo "zerolfx/copilot.el"
+                   :branch "main"
+                   :files ("dist" "*.el")))
+(add-hook 'prog-mode-hook 'copilot-mode)
+(define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -610,6 +642,56 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;; PROLOG ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq prolog-system 'swi
+      prolog-program-switches '((swi ("-G4g" "-T2g" "-L2g" "-O"))
+                                (t nil))
+      prolog-electric-if-then-else-flag t)
+
+(defun prolog-insert-comment-block ()
+  "Insert a PceEmacs-style comment block like /* - - ... - - */ "
+  (interactive)
+  (let ((dashes "-"))
+    (dotimes (_ 36) (setq dashes (concat "- " dashes)))
+    (insert (format "/* %s\n\n%s */" dashes dashes))
+    (forward-line -1)
+    (indent-for-tab-command)))
+
+(global-set-key "\C-cq" 'prolog-insert-comment-block)
+
+(global-set-key "\C-cl" (lambda ()
+                          (interactive)
+                          (insert ":- use_module(library()).")
+                          (forward-char -3)))
+
+(add-hook 'prolog-mode-hook
+          (lambda ()
+            (require 'flymake)
+            (make-local-variable 'flymake-allowed-file-name-masks)
+            (make-local-variable 'flymake-err-line-patterns)
+            (setq flymake-err-line-patterns
+                  '(("ERROR: (?\\(.*?\\):\\([0-9]+\\)" 1 2)
+                    ("Warning: (\\(.*\\):\\([0-9]+\\)" 1 2)))
+            (setq flymake-allowed-file-name-masks
+                  '(("\\.pl\\'" flymake-prolog-init)))
+            (flymake-mode 1)))
+
+(defun flymake-prolog-init ()
+  (let* ((temp-file   (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+         (local-file  (file-relative-name
+                       temp-file
+                       (file-name-directory buffer-file-name))))
+    (list "swipl" (list "-q" "-t" "halt" "-s " local-file))))
+
+(require 'ediprolog)
+
+(global-set-key "\C-c\C-e" 'ediprolog-dwim)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; OS X GUI/SERVER  ;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -638,3 +720,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 (provide '.emacs)
 ;;; .emacs ends here
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; TeX ;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
