@@ -71,7 +71,7 @@
  '(custom-enabled-themes nil)
  '(custom-safe-themes
    '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" default))
- '(datetime-timezone "Europe/Dublin")
+ '(datetime-timezone "Europe/Dublin" t)
  '(mac-mouse-wheel-mode t)
  '(mac-mouse-wheel-smooth-scroll t)
  '(mouse-wheel-mode t)
@@ -302,13 +302,14 @@
     ;; ;;(sublimity-map-set-delay 0)
 
     ;; Mouse smoothish scrolling
-    (require 'smooth-scrolling)
-  (setq smooth-scroll-margin 2)
-  (setq smooth-scrolling-mode 1)
-  (setq mouse-wheel-scroll-amount '(1 ((shift) .1) ((control) . nil)))
+  ;;   (require 'smooth-scrolling)
+  ;; (setq smooth-scroll-margin 2)
+  ;; (setq smooth-scrolling-mode 1)
+  ;; (setq mouse-wheel-scroll-amount '(1 ((shift) .1) ((control) . nil)))
+	(pixel-scroll-mode)
   )
 
-(setq mouse-wheel-progressive-speed t)
+;;(setq mouse-wheel-progressive-speed nil)
 
 (unless window-system
   (require 'mouse)
@@ -379,7 +380,8 @@
   "m" 'helm-bookmarks
   "0" 'toggle-fullscreen
   "w" 'whitespace-mode
-  ";" 'comment-line)
+  ";" 'comment-line
+  "," 'evil-repeat-find-char-reverse)
 
 (require 'evil-quickscope)
 (global-evil-quickscope-always-mode 1)
@@ -504,8 +506,6 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; HELM ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(require 'helm-config)
 
 ;; save bookmarks
 (setq bookmark-default-file "~/.emacs.d/bookmarks"

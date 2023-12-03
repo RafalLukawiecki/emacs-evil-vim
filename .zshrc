@@ -38,6 +38,7 @@ plugins=(
     history
     macos
     colored-man-pages
+		asdf
     z
 )
 
